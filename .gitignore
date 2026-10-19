@@ -1,0 +1,16 @@
+# Build outputs
+build/
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+# Generated bitmap data
+*.bm
+done.txt
+
+# Editor and OS files
+*.swp
+*~
+.DS_Store
