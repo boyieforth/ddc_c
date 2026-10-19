@@ -4,6 +4,24 @@ DDC-C is a standalone **C11** implementation of **DDC (Decoupling Data and Contr
 
 The library depends only on the C standard library. It does not link against or call the C++ implementation. On-disk formats and bit ordering are kept compatible with the reference C++ DDC where the corresponding format is supported.
 
+## Relationship to the reference C++ implementation
+
+The reference DDC implementation is a separate C++ project:
+
+- **Upstream repository:** <https://github.com/junchangwang/DDC>
+- **Project:** DDC — Decoupling Data and Control for Bitmap Compression
+
+DDC-C is an independent C11 reimplementation of that project's standard four-level format. The production library is pure C and has no build-time or run-time dependency on the C++ code.
+
+This repository contains **two optional C++ files**, used only to validate the C implementation against the reference implementation:
+
+| File | Purpose | Built by `make all`? |
+|---|---|---|
+| `test/ddc_c_cpp_parity.cpp` | Compares C and C++ behavior, state, compression size, and wire formats | No |
+| `tools/ddc_c_cpp_boolean_bench.cpp` | Side-by-side C/C++ benchmark for boolean operations | No |
+
+Both files `#include "ddc.h"` from the upstream C++ project and therefore require a local checkout of <https://github.com/junchangwang/DDC>; see [C/C++ parity harness](#cc-parity-harness-optional). They are validation tooling, not part of the library. No upstream C++ source code is vendored in this repository. The upstream repository did not declare a license at the time of writing, so its code is not redistributed here.
+
 ## Highlights
 
 - Exact four-level DDC encoding (`DDCBtv`) with segmented containers
@@ -182,10 +200,13 @@ Optional arguments restrict the run to one cardinality and emit per-iteration ra
 
 ### C/C++ parity harness (optional)
 
-[`test/ddc_c_cpp_parity.cpp`](test/ddc_c_cpp_parity.cpp) compares the C and C++ implementations for logic, state, compression size, and wire formats. It requires a checkout of the reference C++ DDC headers and sources; it is not needed to build or use the C library.
+[`test/ddc_c_cpp_parity.cpp`](test/ddc_c_cpp_parity.cpp) compares the C and C++ implementations for logic, state, compression size, and wire formats. It links against the **reference C++ DDC project** at <https://github.com/junchangwang/DDC>, which must be checked out separately; it is not needed to build or use the C library.
 
 ```sh
-# Compile the C sources as C, then link the harness with the C++ sources.
+# 1. Check out the reference C++ implementation somewhere outside this repo.
+git clone https://github.com/junchangwang/DDC.git /path/to/DDC
+
+# 2. Compile the C sources as C, then link the harness with the C++ sources.
 for f in base ops serial sparse; do
     /usr/bin/gcc -O3 -march=native -std=gnu11 -Iinclude \
         -c src/ddc_c_$f.c -o /tmp/ddc_c_$f.o
@@ -198,7 +219,7 @@ done
     -o build/ddc_c_cpp_parity
 ```
 
-`tools/ddc_c_cpp_boolean_bench.cpp` is the corresponding C/C++ benchmark and has the same external prerequisite.
+`tools/ddc_c_cpp_boolean_bench.cpp` is the corresponding C/C++ benchmark and has the same external prerequisite. Use `--quick` for a smoke run, or `--help` for the full matrix and profiling options.
 
 ## Repository layout
 
@@ -211,10 +232,10 @@ src/ddc_c_sparse.c                 Sparse DDC operations
 src/ddc_c_internal.h               Internal helpers and SIMD gates
 test/ddc_c_selftest.c              Self-test
 test/ddc_c_deserialize_fuzz.c      Malformed-input fuzzer
-test/ddc_c_cpp_parity.cpp          Optional C/C++ parity harness
+test/ddc_c_cpp_parity.cpp          Optional parity test vs. upstream C++ DDC; not built by default
 tools/gen_ddc_c.c                  Bitmap generator
 tools/bench_ops_w8_c.c             Boolean-operation benchmark
-tools/ddc_c_cpp_boolean_bench.cpp  Optional C/C++ benchmark
+tools/ddc_c_cpp_boolean_bench.cpp  Optional C/C++ benchmark vs. upstream C++ DDC; not built by default
 Makefile                           Standalone build
 ```
 

@@ -1,3 +1,13 @@
+/*
+ * C/C++ parity harness.
+ *
+ * This file is NOT part of the DDC-C library. It links the C implementation
+ * against the reference C++ DDC implementation and verifies that both produce
+ * identical state, statistics, compression sizes, and wire-format bytes.
+ *
+ * Reference C++ project: https://github.com/junchangwang/DDC
+ * Build instructions: see README.md ("C/C++ parity harness").
+ */
 #include "ddc.h"
 extern "C" {
 #include "ddc_c.h"

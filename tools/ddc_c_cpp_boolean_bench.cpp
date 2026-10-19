@@ -1,3 +1,13 @@
+/*
+ * C/C++ boolean-operation benchmark.
+ *
+ * This file is NOT part of the DDC-C library. It compares the C
+ * implementation with the reference C++ DDC implementation on identical
+ * workloads and emits CSV results.
+ *
+ * Reference C++ project: https://github.com/junchangwang/DDC
+ * Build instructions: see README.md ("C/C++ parity harness").
+ */
 #include "ddc.h"
 #include "ddc_c.h"
 
